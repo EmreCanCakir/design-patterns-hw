@@ -1,6 +1,8 @@
 package org.example;
 
+import org.example.Factory.RecipeCategoryFactory;
 import org.example.Factory.RecipeFactory;
+import org.example.Factory.RecipeTagFactory;
 import org.example.model.Ingredient;
 import org.example.model.Recipe;
 import org.example.model.RecipeCategory;
@@ -14,6 +16,8 @@ public class Test {
     private RecipeManager recipeManager;
     private RecipeRatingManager ratingManager;
     private RecipeFactory recipeFactory;
+    private RecipeCategoryFactory recipeCategoryFactory;
+    private RecipeTagFactory recipeTagFactory;
 
     private boolean isRecipeModuleShowed = true;
 
@@ -21,6 +25,8 @@ public class Test {
         recipeManager = RecipeManager.getInstance();
         ratingManager = new RecipeRatingManager();
         recipeFactory = new RecipeFactory();
+        recipeCategoryFactory = new RecipeCategoryFactory();
+        recipeTagFactory = new RecipeTagFactory();
     }
 
     public void run() {
@@ -42,12 +48,13 @@ public class Test {
                     break;
                 case 2:
                     searchRecipes(scanner);
+                    writeRecipeDetails(scanner);
                     break;
                 case 3:
-                    //rateRecipe(scanner);
+                    rateRecipe(scanner);
                     break;
                 case 4:
-                    //modifyRecipe(scanner);
+                    modifyRecipe(scanner);
                     break;
                 case 5:
                     isRecipeModuleShowed = false;
@@ -75,7 +82,7 @@ public class Test {
 
             System.out.print("Enter ingredient amount: ");
             double amount = scanner.nextDouble();
-            scanner.nextLine(); // consume the newline character
+            scanner.nextLine();
 
             System.out.print("Enter ingredient unit: ");
             String unit = scanner.nextLine();
@@ -99,7 +106,7 @@ public class Test {
                 break;
             }
 
-            RecipeCategory category = new RecipeCategory(categoryName);
+            RecipeCategory category = recipeCategoryFactory.createRecipeCategory(categoryName);
             categories.add(category);
         }
 
@@ -112,7 +119,7 @@ public class Test {
                 break;
             }
 
-            RecipeTag tag = new RecipeTag(tagName);
+            RecipeTag tag = recipeTagFactory.createRecipeTag(tagName);
             tags.add(tag);
         }
 
@@ -133,6 +140,54 @@ public class Test {
             System.out.println("Recipe not saved");
     }
 
+    private void modifyRecipe(Scanner scanner) {
+        searchRecipes(scanner);
+
+        System.out.println("You can select recipe to get details, or update process. Please enter recipe name (or \"done\" to finish): ");
+        String decision = scanner.nextLine().toLowerCase(Locale.ROOT);
+
+        if (decision.equals("done")) return;
+
+        Recipe selectedRecipe = recipeManager.getRecipe(decision);
+        if (selectedRecipe == null) return;
+        System.out.println("Recipe details: ");
+
+        System.out.println("Name: " + (selectedRecipe.getName()));
+        String updatedName = scanner.nextLine();
+        if (!updatedName.isEmpty()) selectedRecipe.setName(updatedName);
+
+        for (int i = 0; i < selectedRecipe.getCategories().size(); i++) {
+            System.out.println("Category " + (i + 1) + ": " + selectedRecipe.getCategories().get(i).categoryName);
+            String updatedCategory = scanner.nextLine();
+            if (!updatedCategory.isEmpty()) selectedRecipe.getCategories().get(i).categoryName = updatedCategory;
+        }
+        if (selectedRecipe.getCategories().size() != 3){
+            for (int i = selectedRecipe.getCategories().size(); i < 3; i++) {
+                System.out.println("Category " + (i + 1) + ": ");
+                String updatedCategory = scanner.nextLine();
+                if (!updatedCategory.isEmpty()) selectedRecipe.getCategories().add(new RecipeCategory(updatedCategory));
+            }
+        }
+
+        for (int i = 0; i < selectedRecipe.getTags().size(); i++) {
+            System.out.println("Tag " + (i + 1) + ": " + selectedRecipe.getTags().get(i).tagName);
+            String updatedTag = scanner.nextLine();
+            if (!updatedTag.isEmpty()) selectedRecipe.getTags().get(i).tagName = updatedTag;
+        }
+
+        if (selectedRecipe.getTags().size() != 3){
+            for (int i = selectedRecipe.getTags().size(); i < 3; i++) {
+                System.out.println("Tag " + (i + 1) + ": ");
+                String updatedTag = scanner.nextLine();
+                if (!updatedTag.isEmpty()) selectedRecipe.getTags().add(new RecipeTag(updatedTag));
+            }
+        }
+
+        System.out.println("Cooking Instructions: " + selectedRecipe.getCookingInstructions());
+        String updatedCookingIns = scanner.nextLine();
+        if (!updatedCookingIns.isEmpty()) selectedRecipe.setCookingInstructions(updatedCookingIns);
+    }
+
     private void searchRecipes(Scanner scanner) {
         System.out.println("Enter recipe name, tags, ingredients, or categories.");
         String searchText = scanner.nextLine().toLowerCase(Locale.ROOT);
@@ -148,23 +203,44 @@ public class Test {
             }
         }
         foundRecipes.forEach(recipe -> System.out.print("---" + recipe.getName() + "---"));
+    }
+
+    private void writeRecipeDetails(Scanner scanner) {
         System.out.println("You can select recipe to get details, Please enter recipe name (or \"done\" to finish): ");
         String decision = scanner.nextLine().toLowerCase(Locale.ROOT);
 
-        if(!decision.equals("done")){
-            Recipe selectedRecipe = recipeManager.getRecipe(decision);
-            if (selectedRecipe == null) return;
-            System.out.println("Recipe details: ");
-            System.out.println("Name: " + (selectedRecipe.getName()));
-            for (int i = 0; i<selectedRecipe.getCategories().size(); i++){
-                System.out.println("Category " + (i+1) + ": " + selectedRecipe.getCategories().get(i).categoryName);
-            }
-            for (int i = 0; i<selectedRecipe.getTags().size(); i++){
-                System.out.println("Tag " + (i+1) + ": " + selectedRecipe.getTags().get(i).tagName);
-            }
-            System.out.println("Cooking Instructions: " + selectedRecipe.getCookingInstructions());
-            System.out.println("Impact Property: " + selectedRecipe.getImpactProperty());
+        if (decision.equals("done")) return;
+
+        Recipe selectedRecipe = recipeManager.getRecipe(decision);
+        if (selectedRecipe == null) return;
+        System.out.println("Recipe details: ");
+        System.out.println("Name: " + (selectedRecipe.getName()));
+        for (int i = 0; i < selectedRecipe.getCategories().size(); i++) {
+            System.out.println("Category " + (i + 1) + ": " + selectedRecipe.getCategories().get(i).categoryName);
         }
+        for (int i = 0; i < selectedRecipe.getTags().size(); i++) {
+            System.out.println("Tag " + (i + 1) + ": " + selectedRecipe.getTags().get(i).tagName);
+        }
+        System.out.println("Cooking Instructions: " + selectedRecipe.getCookingInstructions());
+        System.out.println("Impact Property: " + selectedRecipe.getImpactProperty());
+    }
+
+    private void rateRecipe(Scanner scanner) {
+        searchRecipes(scanner);
+
+        System.out.println("You can select recipe to get details, Please enter recipe name (or \"done\" to finish): ");
+        String decision = scanner.nextLine().toLowerCase(Locale.ROOT);
+
+        if (decision.equals("done")) return;
+
+        Recipe selectedRecipe = recipeManager.getRecipe(decision);
+        if (selectedRecipe == null) return;
+
+        System.out.println("Please enter rating between 1 to 5");
+        int rating = scanner.nextInt();
+
+        selectedRecipe.addRating(rating);
+        System.out.println("Average rating that recipe is:  "+ selectedRecipe.getAverageRating());
     }
 
     private int getIntegerValueWithScanner(Scanner scanner, String errorMessage) {

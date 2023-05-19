@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class RecipeManager {
-    private static RecipeManager instance;
+    private static RecipeManager instance = null;
 
     private List<Recipe> recipes;
 

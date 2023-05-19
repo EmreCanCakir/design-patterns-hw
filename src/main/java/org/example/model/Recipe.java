@@ -36,7 +36,7 @@ public class Recipe implements RecipeRatingSubject {
         notifyObservers(this);
     }
 
-    public int getTotalRatings() {
+    public int getTotalRatingsCount() {
         return ratings.size();
     }
 
@@ -74,6 +74,14 @@ public class Recipe implements RecipeRatingSubject {
         for (RecipeRatingObserver observer : observers) {
             observer.updateRating(recipe, ratings.get(ratings.size() - 1));
         }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCookingInstructions(String cookingInstructions) {
+        this.cookingInstructions = cookingInstructions;
     }
 
     public String getName() {
