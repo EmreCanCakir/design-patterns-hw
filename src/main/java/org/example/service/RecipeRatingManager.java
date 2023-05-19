@@ -28,6 +28,7 @@ public class RecipeRatingManager implements RecipeRatingObserver {
     public void updateRating(Recipe recipe, int newRating) {
         // Compute the impact property of the recipe based on the new rating
         // and update the recipe's impact property
+        recipe.addRating(newRating);
         int totalRatings = recipe.getTotalRatingsCount();
         double averageRating = recipe.getAverageRating();
         double newAverageRating = (averageRating * totalRatings + newRating) / (totalRatings + 1);

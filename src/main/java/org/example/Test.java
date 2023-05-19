@@ -222,7 +222,7 @@ public class Test {
             System.out.println("Tag " + (i + 1) + ": " + selectedRecipe.getTags().get(i).tagName);
         }
         System.out.println("Cooking Instructions: " + selectedRecipe.getCookingInstructions());
-        System.out.println("Impact Property: " + selectedRecipe.getAverageRating());
+        System.out.println("Impact Property: " + selectedRecipe.getImpactProperty());
 
         System.out.println("If you want to see total ratings as Impact Property enter \"get\" (or \"done\" to continue): ");
         String impactDecision = scanner.nextLine().toLowerCase(Locale.ROOT);
@@ -243,9 +243,8 @@ public class Test {
         System.out.println("Please enter rating between 1 to 5");
         int rating = scanner.nextInt();
 
-        selectedRecipe.addRating(rating);
-        System.out.println("Total ratings that recipe is:  "+ selectedRecipe.getTotalRatings());
-        System.out.println("Average rating that recipe is:  "+ selectedRecipe.getAverageRating());
+        ratingManager.updateRating(selectedRecipe, rating);
+        System.out.println("Impact property is that recipe : "+ selectedRecipe.getImpactProperty());
     }
 
     private int getIntegerValueWithScanner(Scanner scanner, String errorMessage) {
