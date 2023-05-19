@@ -40,15 +40,19 @@ public class Recipe implements RecipeRatingSubject {
         return ratings.size();
     }
 
-    public double getAverageRating() {
-        if (ratings.isEmpty()) {
-            return 0.0;
-        }
+    public double getTotalRatings() {
         double sum = 0;
         for (int rating : ratings) {
             sum += rating;
         }
-        return sum / ratings.size();
+        return sum;
+    }
+
+    public double getAverageRating() {
+        if (ratings.isEmpty()) {
+            return 0.0;
+        }
+        return getTotalRatings() / ratings.size();
     }
 
     public double getImpactProperty() {
